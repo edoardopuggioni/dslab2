@@ -398,11 +398,11 @@ try:
         if action == "vesselCrashed":
 
             print "\n****************************************"
-            print "[DEBUG] The vessel crashed :" + element_id
+            print "[DEBUG] The vessel crashed :" + potential_leader
             print "****************************************\n"
 
             if str(element_id) != str(node_id) :
-                del vessel_list[str(element_id)]
+                del vessel_list[str(potential_leader)]
 
                 path = '/propagate/vesselCrashed/' + str(element_id) + '/' + str(potential_leader)
 
