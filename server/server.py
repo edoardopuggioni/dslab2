@@ -20,7 +20,7 @@ import argparse
 from threading import Thread
 from random import randint
 
-from bottle import Bottle, run, request, template, redirect
+from bottle import Bottle, run, request, template, redirect, route, abort
 import requests
 
 # ------------------------------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ try:
                 thread.deamon = True
                 thread.start()
 
-                redirect("/error")
+                abort(401, "Sorry, access denied.")
         pass
 
     # ------------------------------------------------------------------------------------------------------
