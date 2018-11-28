@@ -343,28 +343,6 @@ try:
         if action == "del":
             delete_element_from_store(entry_sequence=element_id)
 
-        # --------------------------------------------------------------------------------------------------------------
-
-        # Leader election propagation
-
-        if action == "notLeader":
-            print "not leader ACTIVATED WARNING WARNING !"
-
-        if action == "isLeader":
-
-            leader_id = element_id
-            print "Leader decision received: " + str(leader_id)
-
-            if str(element_id) == str(node_id):
-                # Propagation of leader decision is finished, I can stop
-                return
-
-            else:
-                path = '/propagate/isLeader/' + str(leader_id)
-                thread = Thread(target=propagate_to_neighbour, args=(path,))
-                thread.deamon = True
-                thread.start()
-
         pass
 
 
@@ -380,8 +358,6 @@ try:
                 leader_id = potential_leader
 
                 print "Initiator: leader is decided: " + str(leader_id)
-
-                redirect("/")
 
                 #path = '/propagate/isLeader/' + str(leader_id)
                 #thread = Thread(target=propagate_to_neighbour, args=(path,))
@@ -425,7 +401,6 @@ try:
                 thread.deamon = True
                 thread.start()
 
-                abort(401, "Sorry, access denied.")
         pass
 
     # ------------------------------------------------------------------------------------------------------
