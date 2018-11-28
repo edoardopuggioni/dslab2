@@ -96,6 +96,9 @@ try:
     # DISTRIBUTED COMMUNICATIONS FUNCTIONS
     # ------------------------------------------------------------------------------------------------------
     def contact_vessel(vessel_ip, path, payload=None, req='POST'):
+
+        global vessel_list
+
         # Try to contact another server (vessel) through a POST or GET, once
         success = False
         try:
@@ -114,8 +117,14 @@ try:
 
         except Exception as e:
             print e
-            print "Unreachable destination ..., we are gonna remove " + str(vessel_ip)
-            del board[str(vessel_ip)]
+            print "Unreachable destination ..., we are gonna remove ip" + str(vessel_ip)
+            id_to_delete = -1
+            for id, ip in vessel_list.items():
+                if str(ip) == str(vessel_ip):
+                    id_to_delete = id
+                    break
+            print "Unreachable destination ..., we are gonna remove id" + str(id_to_delete)
+            del vessel_list[str(id_to_delete)]
 
             thread = Thread(target=leader_election)
             thread.deamon = True
