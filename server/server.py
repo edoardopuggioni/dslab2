@@ -179,7 +179,8 @@ try:
     def index():
         global board, node_id
         return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
-                        board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French')
+                        board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
+                        error="")
 
     @app.route('/error')
     def index():
