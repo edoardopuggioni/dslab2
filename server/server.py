@@ -192,9 +192,10 @@ try:
     # ------------------------------------------------------------------------------------------------------
 
     @app.post('/vesselCrashed/<first_element_id>/<element_id>')
-    def propagate_vessel_crashed():
+    def propagate_vessel_crashed(first_element_id, element_id):
 
         global vessel_list, node_id
+        
         print "\n****************************************"
         print "[DEBUG] The vessel crashed :" + element_id
         print "****************************************\n"
@@ -212,7 +213,7 @@ try:
             thread = Thread(target=leader_election)
             thread.deamon = True
             thread.start()
-        return
+        pass
 
     @app.post('/board')
     def client_add_received():
