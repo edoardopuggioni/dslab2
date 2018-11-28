@@ -358,10 +358,10 @@ try:
 
                 print "Initiator: leader is decided: " + str(leader_id)
 
-                path = '/propagate/isLeader/' + str(leader_id)
-                thread = Thread(target=propagate_to_neighbour, args=(path,))
-                thread.deamon = True
-                thread.start()
+                #path = '/propagate/isLeader/' + str(leader_id)
+                #thread = Thread(target=propagate_to_neighbour, args=(path,))
+                #thread.deamon = True
+                #thread.start()
 
             else:
 
@@ -373,9 +373,8 @@ try:
                     potential_leader = node_id
                     data = str(election_number)
                 elif election_number == int(data):
-                    if node_id < potential_leader:
+                    if int(node_id) < int(potential_leader):
                         potential_leader = node_id
-                        data = str(election_number)
 
                 path = '/propagate/findPotentialLeader/' + str(element_id) + '/' + str(potential_leader)
                 thread = Thread(target=propagate_to_neighbour, args=(path, data))
