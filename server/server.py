@@ -111,6 +111,14 @@ try:
 
             if res.status_code == 200:
                 success = True
+            else :
+                print "Unreachable destination ..."
+                path = "/test_leader/"
+                vessel_ip = vessel_list[str(node_id)]
+
+                thread = Thread(target=contact_vessel, args=(vessel_ip, path, new_entry,))
+                thread.deamon = True
+                thread.start()
 
         except Exception as e:
             print e
@@ -173,6 +181,7 @@ try:
         print "\n****************************************"
         print "[DEBUG] My leader is:" + leader_id
         print "****************************************\n"
+        leader_election()
         return
 
     @app.post('/board')
