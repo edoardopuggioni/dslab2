@@ -114,7 +114,7 @@ try:
 
         except Exception as e:
             print e
-            print "Unreachable destination ..., we are gonna contact : " + str(ip) + " and remove " + str(vessel_ip)
+            print "Unreachable destination ..., we are gonna remove " + str(vessel_ip)
             del board[str(vessel_ip)]
 
             thread = Thread(target=leader_election)
