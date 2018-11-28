@@ -151,7 +151,7 @@ try:
             neighbour_ip = vessel_list.values()[0]
 
         # Debug prints
-        print "Propagating from " + str(my_ip) + " to " + str(neighbour_ip) + " with path:"
+        print "Propagating to " + str(neighbour_ip) + " with path:"
         print path
 
         success = contact_vessel(str(neighbour_ip), path, payload, req)
