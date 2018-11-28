@@ -20,7 +20,7 @@ import argparse
 from threading import Thread
 from random import randint
 
-from bottle import Bottle, run, request, template
+from bottle import Bottle, run, request, template, redirect
 import requests
 
 # ------------------------------------------------------------------------------------------------------
