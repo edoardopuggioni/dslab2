@@ -349,7 +349,7 @@ try:
     @app.post('/propagate/<action>/<element_id>/<potential_leader>')
     def propagation_received_potential_leader(action, element_id, potential_leader):
 
-        global election_number, node_id, leader_id, vessel_list
+        global election_number, node_id, leader_id, vessel_list, board, board_id
 
         if action == "findPotentialLeader":
             if str(element_id) == str(node_id):
@@ -359,10 +359,11 @@ try:
 
                 print "Initiator: leader is decided: " + str(leader_id)
 
-                #path = '/propagate/isLeader/' + str(leader_id)
-                #thread = Thread(target=propagate_to_neighbour, args=(path,))
-                #thread.deamon = True
-                #thread.start()
+                if str(leader_id) == str(node_id):
+                    lastItemBoard = len(board) - 1
+                    if lastItemBoard >= 0:
+                        board_id = int(board.keys()[lastItemBoard])
+                        print "last item : " + str(board_id)
 
             else:
 
