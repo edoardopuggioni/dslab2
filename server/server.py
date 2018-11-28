@@ -179,8 +179,14 @@ try:
     def index():
         global board, node_id
         return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
+                        board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French')
+
+    @app.route('/error')
+    def index():
+        global board, node_id
+        return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
-                        error='The leader is down... The message is lost, wait a few seconds to find a new leader.')
+                        error='The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.')
 
     @app.get('/board')
     def get_board():
@@ -374,6 +380,8 @@ try:
 
                 print "Initiator: leader is decided: " + str(leader_id)
 
+                redirect("/")
+
                 #path = '/propagate/isLeader/' + str(leader_id)
                 #thread = Thread(target=propagate_to_neighbour, args=(path,))
                 #thread.deamon = True
@@ -416,6 +424,7 @@ try:
                 thread.deamon = True
                 thread.start()
 
+                redirect("/error")
         pass
 
     # ------------------------------------------------------------------------------------------------------
