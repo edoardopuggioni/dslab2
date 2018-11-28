@@ -125,7 +125,7 @@ try:
                     break
             del vessel_list[str(id_to_delete)]
 
-            path = 'propagate/vesselCrashed/' + str(node_id) + '/' + str(id_to_delete)
+            path = '/propagate/vesselCrashed/' + str(node_id) + '/' + str(id_to_delete)
 
             thread = Thread(target=propagate_to_neighbour, args=(path,))
             thread.deamon = True
@@ -404,7 +404,7 @@ try:
             if str(element_id) != str(node_id) :
                 del vessel_list[str(element_id)]
 
-                path = 'propagate/vesselCrashed/' + str(element_id) + '/' + str(potential_leader)
+                path = '/propagate/vesselCrashed/' + str(element_id) + '/' + str(potential_leader)
 
                 thread = Thread(target=propagate_to_neighbour, args=(path,))
                 thread.deamon = True
