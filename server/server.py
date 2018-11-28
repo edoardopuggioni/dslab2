@@ -116,7 +116,7 @@ try:
                 path = "/test_leader/"
                 vessel_ip = vessel_list[str(node_id)]
 
-                thread = Thread(target=contact_vessel, args=(vessel_ip, path, new_entry,))
+                thread = Thread(target=contact_vessel, args=(vessel_ip, path,))
                 thread.deamon = True
                 thread.start()
 
