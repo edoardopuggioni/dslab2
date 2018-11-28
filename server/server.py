@@ -35,10 +35,11 @@ try:
     board_id = 0
 
     # Random variable sets at the beginning to decide which server is gonna be the leader.
-    leaderElection_number = 0
+    election_number = 0
 
     # Variable of the leader_id of the set
     leader_id = 0
+
 
     # ------------------------------------------------------------------------------------------------------
     # BOARD FUNCTIONS
@@ -125,15 +126,20 @@ try:
 
 
     def propagate_to_neighbour(path, payload=None, req='POST'):
+
         global vessel_list, node_id
 
-        numberServer = len(vessel_list)
-        neighbourID = (node_id % (numberServer)) + 1
-        neighbourIP = vessel_list[str(neighbourID)]
+        n_servers = len(vessel_list)
+        my_ip = vessel_list[str(node_id)]
+        neighbour_id = (node_id % n_servers) + 1
+        neighbour_ip = vessel_list[str(neighbour_id)]
 
-        success = contact_vessel(str(neighbourIP), path, payload, req)
+        print "Propagating from " + my_ip + " to " + neighbour_ip + " with path:"
+        print path
+
+        success = contact_vessel(str(neighbour_ip), path, payload, req)
         if not success:
-            print "\n\nCould not contact neighbour \n\n"
+            print "Could not contact neighbour"
 
 
     # ------------------------------------------------------------------------------------------------------
@@ -148,12 +154,14 @@ try:
         return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French')
 
+
     @app.get('/board')
     def get_board():
         global board, node_id
         print board
         return template('server/boardcontents_template.tpl', board_title='Vessel {}'.format(node_id),
                         board_dict=sorted(board.iteritems()))
+
 
     # ------------------------------------------------------------------------------------------------------
     @app.post('/board')
@@ -168,7 +176,7 @@ try:
 
             if request.forms.get('entry') != None:
                 new_entry = request.forms.get('entry')
-            else :
+            else:
                 new_entry = request.body.read()
 
             if str(leader_id) == str(node_id):
@@ -186,7 +194,7 @@ try:
                 thread.deamon = True
                 thread.start()
                 return True
-            else :
+            else:
                 path = "/board"
                 vessel_ip = vessel_list[str(leader_id)]
 
@@ -214,13 +222,12 @@ try:
         if request.forms.get('delete') != None:
             delete = request.forms.get('delete')
             new_entry = request.forms.get('entry')
-        else :
+        else:
             new_entry = request.body.read()
             if new_entry == "":
                 delete = "1"
             else:
                 delete = "0"
-
 
         if delete == "0":
             if str(leader_id) == str(node_id):
@@ -233,7 +240,7 @@ try:
                 thread = Thread(target=propagate_to_vessels, args=(path, new_entry,))
                 thread.deamon = True
                 thread.start()
-            else :
+            else:
                 path = "/board/" + str(element_id) + "/"
                 vessel_ip = vessel_list[str(leader_id)]
 
@@ -253,7 +260,7 @@ try:
                 thread = Thread(target=propagate_to_vessels, args=(path,))
                 thread.deamon = True
                 thread.start()
-            else :
+            else:
                 path = "/board/" + str(element_id) + "/"
                 vessel_ip = vessel_list[str(leader_id)]
 
@@ -281,47 +288,53 @@ try:
             entry = request.body.read()
             add_new_element_to_store(element_id, entry)
 
-
         if action == "mod":
             # We retrieve the new entry from the body of the POST request.
 
             entry = request.body.read()
             modify_element_in_store(element_id, entry)
 
-
         if action == "del":
-
             delete_element_from_store(entry_sequence=element_id)
 
         if action == "notLeader":
-            print "not leader ACTIVATED WARNING WWARNING !"
+            print "not leader ACTIVATED WARNING WARNING !"
 
         if action == "isLeader":
             leader_id = element_id
-            print "THE LEADER : " + str(leader_id)
+            print "THE LEADER IS : " + str(leader_id)
+            if str(element_id) == str(node_id):
+                # Propagation of leader decision is finished, I can stop
+                return
+            else:
+                path = '/propagate/isLeader/' + str(leader_id)
+                thread = Thread(target=propagate_to_neighbour, args=(path,))
+                thread.deamon = True
+                thread.start()
 
         pass
+
 
     @app.post('/propagate/<action>/<element_id>/<potentialLeader>')
     def propagation_received_potential_Leader(action, element_id, potentialLeader):
 
-        global leaderElection_number, node_id, leader_id
+        global election_number, node_id, leader_id
 
         if action == "findPotentialLeader":
-            if str(element_id) == str(node_id): #I am myself, I can stop and decide of the leaderElection
+            if str(element_id) == str(node_id):  # I am myself, I can stop and decide of the leader_election
                 print "THE LEADER : " + str(potentialLeader)
                 leader_id = potentialLeader
                 path = '/propagate/isLeader/' + str(leader_id)
 
-                thread = Thread(target=propagate_to_vessels, args=(path,))
+                thread = Thread(target=propagate_to_neighbour, args=(path,))
                 thread.deamon = True
                 thread.start()
             else:
                 data = request.body.read()
 
-                if leaderElection_number > int(data):
+                if election_number > int(data):
                     potentialLeader = node_id
-                    data = str(leaderElection_number)
+                    data = str(election_number)
 
                 path = '/propagate/findPotentialLeader/' + str(element_id) + '/' + str(potentialLeader)
                 thread = Thread(target=propagate_to_neighbour, args=(path, data))
@@ -333,52 +346,64 @@ try:
     # ------------------------------------------------------------------------------------------------------
     # LEADER ELECTION FUNCTION
     # ------------------------------------------------------------------------------------------------------
-    def getRandomID():
-        numberServer = len(vessel_list)
-        #We are setting the random between 1 and a large number.
-        #We set the beginning to 1 to distinguished the servers : all the server with a id equal to 0 are not-initialized
-        #We multiply the number of servers by 100 to have a large random number and minimize the chances of 2 servers having the same ID.
-        leaderElection_number = randint(1, numberServer * 100)
-        return leaderElection_number
+    def get_random_id():
+        n_servers = len(vessel_list)
+        # We are setting the random between 1 and a large number.
+        # We set the beginning to 1 to distinguished the servers : all the server with a id equal to 0 are
+        # not-initialized.
+        # We multiply the number of servers by 100 to have a large random number and minimize the chances of 2 servers
+        # having the same ID.
 
-    def leaderElection():
-        global leaderElection_number
+        election_number_tmp = randint(1, n_servers * 100)
+        return election_number_tmp
 
-        time.sleep(1)
-        print "starting leader Election"
+
+    def leader_election():
+
+        global election_number
+
+        time.sleep(2)
+
+        print "Starting leader election"
+        #                                          initiator_node       potential_leader
         path = '/propagate/findPotentialLeader/' + str(node_id) + '/' + str(node_id)
-        propagate_to_neighbour(path,str(leaderElection_number))
+        propagate_to_neighbour(path, str(election_number))
 
-        return True;
+        return True
 
 
     # ------------------------------------------------------------------------------------------------------
     # EXECUTION
     # ------------------------------------------------------------------------------------------------------
     # Execute the code
+
     def main():
-        global vessel_list, node_id, app, leaderElection_number
+
+        global vessel_list, node_id, app, election_number
 
         port = 80
-        #port = 8080
+        # port = 8080
         parser = argparse.ArgumentParser(description='Your own implementation of the distributed blackboard')
         parser.add_argument('--id', nargs='?', dest='nid', default=1, type=int, help='This server ID')
         parser.add_argument('--vessels', nargs='?', dest='nbv', default=1, type=int,
                             help='The total number of vessels present in the system')
+
         args = parser.parse_args()
         node_id = args.nid
         vessel_list = dict()
+
         # We need to write the other vessels IP, based on the knowledge of their number
         for i in range(1, args.nbv):
             vessel_list[str(i)] = '10.1.0.{}'.format(str(i))
-            #vessel_list[str(i)] = '127.0.0.{}'.format(str(i))
+            # vessel_list[str(i)] = '127.0.0.{}'.format(str(i))
 
-	    leaderElection_number = getRandomID()
+        election_number = get_random_id()
+        print "I got election_number=" + str(election_number) + "\n"
 
-        if str(node_id) == "1":
-            thread = Thread(target=leaderElection)
-            thread.deamon = True
-            thread.start()
+        # Every node initiates leader election
+        thread = Thread(target=leader_election)
+        thread.deamon = True
+        thread.start()
 
         try:
             run(app, host=vessel_list[str(node_id)], port=port)
@@ -386,8 +411,8 @@ try:
         except Exception as e:
             print e
 
-
     # ------------------------------------------------------------------------------------------------------
+
     if __name__ == '__main__':
         main()
 
