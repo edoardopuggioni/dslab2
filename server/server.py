@@ -125,7 +125,7 @@ try:
                     break
             del vessel_list[str(id_to_delete)]
 
-            path = '/vesselCrashed/' + str(node_id) + '/' + str(id_to_delete)
+            path = 'propagate/vesselCrashed/' + str(node_id) + '/' + str(id_to_delete)
 
             thread = Thread(target=propagate_to_neighbour, args=(path,))
             thread.deamon = True
@@ -190,30 +190,6 @@ try:
 
 
     # ------------------------------------------------------------------------------------------------------
-
-    @app.post('/vesselCrashed/<first_element_id>/<element_id>')
-    def propagate_vessel_crashed(first_element_id, element_id):
-
-        global vessel_list, node_id
-        
-        print "\n****************************************"
-        print "[DEBUG] The vessel crashed :" + element_id
-        print "****************************************\n"
-
-        if str(first_element_id) != str(node_id) :
-            del vessel_list[str(element_id)]
-
-            path = '/vesselCrashed/' + str(first_element_id) + '/' + str(element_id)
-
-            thread = Thread(target=propagate_to_neighbour, args=(path,))
-            thread.deamon = True
-            thread.start()
-
-        if str(element_id) == str(leader_id):
-            thread = Thread(target=leader_election)
-            thread.deamon = True
-            thread.start()
-        pass
 
     @app.post('/board')
     def client_add_received():
@@ -387,10 +363,9 @@ try:
     @app.post('/propagate/<action>/<element_id>/<potential_leader>')
     def propagation_received_potential_leader(action, element_id, potential_leader):
 
-        global election_number, node_id, leader_id
+        global election_number, node_id, leader_id, vessel_list
 
         if action == "findPotentialLeader":
-
             if str(element_id) == str(node_id):
 
                 # I am the initiator, I can stop and decide the leader
@@ -420,9 +395,27 @@ try:
                 thread = Thread(target=propagate_to_neighbour, args=(path, data))
                 thread.deamon = True
                 thread.start()
+        if action == "vesselCrashed"
+
+            print "\n****************************************"
+            print "[DEBUG] The vessel crashed :" + element_id
+            print "****************************************\n"
+
+            if str(element_id) != str(node_id) :
+                del vessel_list[str(element_id)]
+
+                path = 'propagate/vesselCrashed/' + str(element_id) + '/' + str(potential_leader)
+
+                thread = Thread(target=propagate_to_neighbour, args=(path,))
+                thread.deamon = True
+                thread.start()
+
+            if str(potential_leader) == str(leader_id):
+                thread = Thread(target=leader_election)
+                thread.deamon = True
+                thread.start()
 
         pass
-
 
     # ------------------------------------------------------------------------------------------------------
     # LEADER ELECTION FUNCTION
