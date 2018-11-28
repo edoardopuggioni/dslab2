@@ -114,6 +114,13 @@ try:
 
         except Exception as e:
             print e
+            path = "/test_leader"
+            vessel_ip = vessel_list[str(node_id)]
+            print "Unreachable destination ..., we are gonna contact : " + str(vessel_ip)
+
+            thread = Thread(target=contact_vessel, args=(vessel_ip, path,))
+            thread.deamon = True
+            thread.start()
 
         return success
 
@@ -173,6 +180,7 @@ try:
         print "\n****************************************"
         print "[DEBUG] My leader is:" + leader_id
         print "****************************************\n"
+        leader_election()
         return
 
     @app.post('/board')
