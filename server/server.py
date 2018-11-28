@@ -395,7 +395,7 @@ try:
                 thread = Thread(target=propagate_to_neighbour, args=(path, data))
                 thread.deamon = True
                 thread.start()
-        if action == "vesselCrashed"
+        if action == "vesselCrashed":
 
             print "\n****************************************"
             print "[DEBUG] The vessel crashed :" + element_id
