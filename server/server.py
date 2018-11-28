@@ -439,8 +439,6 @@ try:
             # vessel_list[str(i)] = '127.0.0.{}'.format(str(i))
 
         election_number = get_random_id()
-        if node_id == 2 or node_id == 7:
-            election_number = 1000
         print "I got election_number=" + str(election_number) + "\n"
 
         # Every node initiates leader election
