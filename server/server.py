@@ -360,10 +360,13 @@ try:
                 print "Initiator: leader is decided: " + str(leader_id)
 
                 if str(leader_id) == str(node_id):
-                    lastItemBoard = len(board) - 1
-                    if lastItemBoard >= 0:
-                        board_id = int(board.keys()[lastItemBoard])
-                        print "last item : " + str(board_id)
+                    max = -1;
+                    for id in board:
+                        if max <= int(id):
+                            max = int(id)
+
+                    board_id = max + 1
+                    print "last item : " + str(board_id)
 
             else:
 
