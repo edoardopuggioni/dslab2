@@ -158,7 +158,6 @@ try:
         return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French')
 
-
     @app.get('/board')
     def get_board():
         global board, node_id
@@ -168,6 +167,14 @@ try:
 
 
     # ------------------------------------------------------------------------------------------------------
+
+    @app.post('/test_leader')
+    def test_leader():
+        print "\n****************************************"
+        print "[DEBUG] My leader is:" + leader_id
+        print "****************************************\n"
+        return
+
     @app.post('/board')
     def client_add_received():
 
@@ -365,6 +372,10 @@ try:
                 if election_number > int(data):
                     potential_leader = node_id
                     data = str(election_number)
+                elif election_number == int(data):
+                    if node_id < potential_leader:
+                        potential_leader = node_id
+                        data = str(election_number)
 
                 path = '/propagate/findPotentialLeader/' + str(element_id) + '/' + str(potential_leader)
                 thread = Thread(target=propagate_to_neighbour, args=(path, data))
@@ -429,6 +440,8 @@ try:
             # vessel_list[str(i)] = '127.0.0.{}'.format(str(i))
 
         election_number = get_random_id()
+        if node_id == 2 or node_id == 7:
+            election_number = 1000
         print "I got election_number=" + str(election_number) + "\n"
 
         # Every node initiates leader election
