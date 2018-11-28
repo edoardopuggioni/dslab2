@@ -40,7 +40,6 @@ try:
     # Variable of the leader_id of the set
     leader_id = 0
 
-
     # ------------------------------------------------------------------------------------------------------
     # BOARD FUNCTIONS
     # ------------------------------------------------------------------------------------------------------
@@ -106,12 +105,16 @@ try:
                 res = requests.get('http://{}{}'.format(vessel_ip, path))
             else:
                 print 'Non implemented feature!'
+
             # result is in res.text or res.json()
             print(res.text)
+
             if res.status_code == 200:
                 success = True
+
         except Exception as e:
             print e
+
         return success
 
 
@@ -134,8 +137,9 @@ try:
         neighbour_id = (node_id % n_servers) + 1
         neighbour_ip = vessel_list[str(neighbour_id)]
 
-        print "Propagating from " + my_ip + " to " + neighbour_ip + " with path:"
-        print path
+        # Debug prints
+        # print "Propagating from " + my_ip + " to " + neighbour_ip + " with path:"
+        # print path
 
         success = contact_vessel(str(neighbour_ip), path, payload, req)
         if not success:
@@ -167,19 +171,21 @@ try:
     @app.post('/board')
     def client_add_received():
 
-        # Adds a new element to the board
-        # Called directly when a user is doing a POST request on /board
+        # Adds a new element to the board.
+        # Called directly when a user is doing a POST request on /board.
 
         global board, node_id, board_id, leader_id
 
         try:
 
-            if request.forms.get('entry') != None:
+            if request.forms.get('entry') is not None:
                 new_entry = request.forms.get('entry')
+
             else:
                 new_entry = request.body.read()
 
             if str(leader_id) == str(node_id):
+
                 # We add new element to dictionary using board_id as entry sequence.
                 add_new_element_to_store(str(board_id), new_entry)
 
@@ -193,14 +199,18 @@ try:
                 thread = Thread(target=propagate_to_vessels, args=(path, new_entry,))
                 thread.deamon = True
                 thread.start()
+
                 return True
+
             else:
+
                 path = "/board"
                 vessel_ip = vessel_list[str(leader_id)]
 
                 thread = Thread(target=contact_vessel, args=(vessel_ip, path, new_entry,))
                 thread.deamon = True
                 thread.start()
+
                 return True
 
         except Exception as e:
@@ -219,7 +229,7 @@ try:
         # 0 is received when the user clicks on "modify".
         # 1 is received when the user clicks on "delete".
 
-        if request.forms.get('delete') != None:
+        if request.forms.get('delete') is not None:
             delete = request.forms.get('delete')
             new_entry = request.forms.get('entry')
         else:
@@ -230,8 +240,9 @@ try:
                 delete = "0"
 
         if delete == "0":
+            # User wants to modify entry with ID given by element_id.
+
             if str(leader_id) == str(node_id):
-                # User wants to modify entry with ID given by element_id.
                 modify_element_in_store(str(element_id), new_entry)
 
                 # Build path to propagate using keyword "mod" which stands for "modify".
@@ -240,13 +251,16 @@ try:
                 thread = Thread(target=propagate_to_vessels, args=(path, new_entry,))
                 thread.deamon = True
                 thread.start()
+
             else:
+
                 path = "/board/" + str(element_id) + "/"
                 vessel_ip = vessel_list[str(leader_id)]
 
                 thread = Thread(target=contact_vessel, args=(vessel_ip, path, new_entry,))
                 thread.deamon = True
                 thread.start()
+
                 return True
 
         elif delete == "1":
@@ -277,6 +291,8 @@ try:
 
         global board_id, node_id, leader_id
 
+        # Lab 1 propagation actions
+
         # Propagate action. An action is distinguished using one of the three keywords "add", "mod" and "del", which
         # stand for add, modify and delete respectively. After identifying the action, we identify the entry to
         # add/modify/delete by using the variable element_id, and also in the case of add and modify, the new entry can
@@ -284,7 +300,6 @@ try:
 
         if action == "add":
             # If we are the leader_id we retrieve the new entry from the body of the POST request.
-
             entry = request.body.read()
             add_new_element_to_store(element_id, entry)
 
@@ -297,15 +312,22 @@ try:
         if action == "del":
             delete_element_from_store(entry_sequence=element_id)
 
+        # --------------------------------------------------------------------------------------------------------------
+
+        # Leader election propagation
+
         if action == "notLeader":
             print "not leader ACTIVATED WARNING WARNING !"
 
         if action == "isLeader":
+
             leader_id = element_id
-            print "THE LEADER IS : " + str(leader_id)
+            print "Leader decision received: " + str(leader_id)
+
             if str(element_id) == str(node_id):
                 # Propagation of leader decision is finished, I can stop
                 return
+
             else:
                 path = '/propagate/isLeader/' + str(leader_id)
                 thread = Thread(target=propagate_to_neighbour, args=(path,))
@@ -315,31 +337,40 @@ try:
         pass
 
 
-    @app.post('/propagate/<action>/<element_id>/<potentialLeader>')
-    def propagation_received_potential_Leader(action, element_id, potentialLeader):
+    @app.post('/propagate/<action>/<element_id>/<potential_leader>')
+    def propagation_received_potential_leader(action, element_id, potential_leader):
 
         global election_number, node_id, leader_id
 
         if action == "findPotentialLeader":
-            if str(element_id) == str(node_id):  # I am myself, I can stop and decide of the leader_election
-                print "THE LEADER : " + str(potentialLeader)
-                leader_id = potentialLeader
-                path = '/propagate/isLeader/' + str(leader_id)
 
+            if str(element_id) == str(node_id):
+
+                # I am the initiator, I can stop and decide the leader
+                leader_id = potential_leader
+
+                print "Initiator: leader is decided: " + str(leader_id)
+
+                path = '/propagate/isLeader/' + str(leader_id)
                 thread = Thread(target=propagate_to_neighbour, args=(path,))
                 thread.deamon = True
                 thread.start()
+
             else:
+
+                # I am not the initiator of this election
+
                 data = request.body.read()
 
                 if election_number > int(data):
-                    potentialLeader = node_id
+                    potential_leader = node_id
                     data = str(election_number)
 
-                path = '/propagate/findPotentialLeader/' + str(element_id) + '/' + str(potentialLeader)
+                path = '/propagate/findPotentialLeader/' + str(element_id) + '/' + str(potential_leader)
                 thread = Thread(target=propagate_to_neighbour, args=(path, data))
                 thread.deamon = True
                 thread.start()
+
         pass
 
 
