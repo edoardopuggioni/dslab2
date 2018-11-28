@@ -142,20 +142,23 @@ try:
 
         next = 0
         my_ip = 0
+	neighbour_ip = -1
         
-        for id, ip in vessel_list:
+        for id, ip in vessel_list.iteritems():
             print "id : " + str(id) + " ip : " + str(ip)
             if next == 1:
+		print "trouvé mon voisin ip : " + str(ip)
                 neighbour_ip = ip
                 break
-            if id == node_id
+            if int(id) == int(node_id):
+		print "trouvé mon ip : " + str(ip)
                 my_ip = ip
-                next = 1
-        if next == 1 and neighbour_ip == None:
+                next += 1
+        if next == 1 and neighbour_ip == -1:
             neighbour_ip = vessel_list.values()[0]
 
         # Debug prints
-        print "Propagating from " + my_ip + " to " + neighbour_ip + " with path:"
+        print "Propagating from " + str(my_ip) + " to " + str(neighbour_ip) + " with path:"
         print path
 
         success = contact_vessel(str(neighbour_ip), path, payload, req)
