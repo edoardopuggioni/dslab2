@@ -97,7 +97,7 @@ try:
     # ------------------------------------------------------------------------------------------------------
     def contact_vessel(vessel_ip, path, payload=None, req='POST'):
 
-        global vessel_list
+        global vessel_list, node_id
 
         # Try to contact another server (vessel) through a POST or GET, once
         success = False
@@ -117,16 +117,17 @@ try:
 
         except Exception as e:
             print e
-            print "Unreachable destination ..., we are gonna remove ip" + str(vessel_ip)
+
             id_to_delete = -1
             for id, ip in vessel_list.items():
                 if str(ip) == str(vessel_ip):
                     id_to_delete = id
                     break
-            print "Unreachable destination ..., we are gonna remove id" + str(id_to_delete)
             del vessel_list[str(id_to_delete)]
 
-            thread = Thread(target=leader_election)
+            path = '/vesselCrashed/' + str(node_id) + '/' + str(id_to_delete)
+
+            thread = Thread(target=propagate_to_neighbour, args=(path,))
             thread.deamon = True
             thread.start()
 
@@ -190,11 +191,27 @@ try:
 
     # ------------------------------------------------------------------------------------------------------
 
-    @app.post('/test_leader')
-    def test_leader():
+    @app.post('/vesselCrashed/<first_element_id>/<element_id>')
+    def propagate_vessel_crashed():
+
+        global vessel_list, node_id
         print "\n****************************************"
-        print "[DEBUG] My leader is:" + leader_id
+        print "[DEBUG] The vessel crashed :" + element_id
         print "****************************************\n"
+
+        if str(first_element_id) != str(node_id) :
+            del vessel_list[str(element_id)]
+
+            path = '/vesselCrashed/' + str(first_element_id) + '/' + str(element_id)
+
+            thread = Thread(target=propagate_to_neighbour, args=(path,))
+            thread.deamon = True
+            thread.start()
+
+        if str(element_id) == str(leader_id):
+            thread = Thread(target=leader_election)
+            thread.deamon = True
+            thread.start()
         return
 
     @app.post('/board')
