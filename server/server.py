@@ -112,13 +112,14 @@ try:
             if res.status_code == 200:
                 success = True
             else :
-                print "Unreachable destination ..."
+
                 path = "/test_leader/"
                 vessel_ip = vessel_list[str(node_id)]
+                print "Unreachable destination ..., we are gonna contact : " + str(vessel_ip)
 
                 thread = Thread(target=contact_vessel, args=(vessel_ip, path,))
                 thread.deamon = True
-                thread.start()
+                #thread.start()
 
         except Exception as e:
             print e
