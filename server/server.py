@@ -132,7 +132,7 @@ try:
             thread.start()
 
             return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
-                            board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French')
+                            board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French', error='The leader is down... The message is lost, wait a few seconds to find a new leader.')
 
         return success
 
