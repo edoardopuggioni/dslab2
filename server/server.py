@@ -115,8 +115,9 @@ try:
         except Exception as e:
             print e
             path = "/test_leader"
-            vessel_ip = vessel_list[str(node_id)]
-            print "Unreachable destination ..., we are gonna contact : " + str(vessel_ip)
+            ip = vessel_list[str(node_id)]
+            print "Unreachable destination ..., we are gonna contact : " + str(ip) + " and remove " + str(vessel_ip)
+            del board[str(vessel_ip)]
 
             thread = Thread(target=contact_vessel, args=(vessel_ip, path,))
             thread.deamon = True
@@ -139,14 +140,23 @@ try:
 
         global vessel_list, node_id
 
-        n_servers = len(vessel_list)
-        my_ip = vessel_list[str(node_id)]
-        neighbour_id = (node_id % n_servers) + 1
-        neighbour_ip = vessel_list[str(neighbour_id)]
+        next = 0
+        my_ip = 0
+        
+        for id, ip in vessel_list:
+            print "id : " + str(id) + " ip : " + str(ip)
+            if next == 1:
+                neighbour_ip = ip
+                break
+            if id == node_id
+                my_ip = ip
+                next = 1
+        if next == 1 and neighbour_ip == None:
+            neighbour_ip = vessel_list.values()[0]
 
         # Debug prints
-        # print "Propagating from " + my_ip + " to " + neighbour_ip + " with path:"
-        # print path
+        print "Propagating from " + my_ip + " to " + neighbour_ip + " with path:"
+        print path
 
         success = contact_vessel(str(neighbour_ip), path, payload, req)
         if not success:
@@ -450,9 +460,10 @@ try:
         print "I got election_number=" + str(election_number) + "\n"
 
         # Every node initiates leader election
-        thread = Thread(target=leader_election)
-        thread.deamon = True
-        thread.start()
+        if node_id == 1:
+            thread = Thread(target=leader_election)
+            thread.deamon = True
+            thread.start()
 
         try:
             run(app, host=vessel_list[str(node_id)], port=port)
