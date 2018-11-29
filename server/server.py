@@ -351,9 +351,10 @@ try:
 
                 # I am the initiator, I can stop and decide the leader
                 leader_id = potential_leader
+                data = request.body.read()
 
                 print "Leader is decided: " + str(leader_id)
-                display_error = 'Leader : ' + str(leader_id)
+                display_error = 'Leader : ' + str(leader_id) +", election_number : " + str(data)
 
                 if str(leader_id) == str(node_id):
                     max = -1;
