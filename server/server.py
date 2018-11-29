@@ -40,6 +40,8 @@ try:
     # Variable of the leader_id of the set
     leader_id = 0
 
+    display_error = ""
+
     # ------------------------------------------------------------------------------------------------------
     # BOARD FUNCTIONS
     # ------------------------------------------------------------------------------------------------------
@@ -177,10 +179,10 @@ try:
 
     @app.route('/')
     def index():
-        global board, node_id
+        global board, node_id, display_error
         return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
-                        error="")
+                        error = display_error)
 
     @app.route('/error')
     def index():
@@ -349,7 +351,7 @@ try:
     @app.post('/propagate/<action>/<element_id>/<potential_leader>')
     def propagation_received_potential_leader(action, element_id, potential_leader):
 
-        global election_number, node_id, leader_id, vessel_list, board, board_id
+        global election_number, node_id, leader_id, vessel_list, board, board_id, display_error
 
         if action == "findPotentialLeader":
             if str(element_id) == str(node_id):
@@ -404,6 +406,8 @@ try:
                 thread = Thread(target=leader_election)
                 thread.deamon = True
                 thread.start()
+
+                display_error = 'The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.'
 
         pass
 
