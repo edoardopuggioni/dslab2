@@ -353,6 +353,7 @@ try:
                 leader_id = potential_leader
 
                 print "Leader is decided: " + str(leader_id)
+                display_error = 'Leader : ' + str(leader_id)
 
                 if str(leader_id) == str(node_id):
                     max = -1;
@@ -386,8 +387,6 @@ try:
             print "[DEBUG] The vessel crashed :" + potential_leader
             print "****************************************\n"
 
-            display_error = 'The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.'
-
             if str(element_id) != str(node_id) :
                 del vessel_list[str(potential_leader)]
 
@@ -398,6 +397,8 @@ try:
                 thread.start()
 
             if str(potential_leader) == str(leader_id):
+                display_error = 'The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.'
+
                 thread = Thread(target=leader_election)
                 thread.deamon = True
                 thread.start()
