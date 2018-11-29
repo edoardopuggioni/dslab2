@@ -431,7 +431,7 @@ try:
 
         global election_number
 
-        time.sleep(2)
+        time.sleep(0.5)
 
         print "Starting leader election"
         #                                          initiator_node       potential_leader
