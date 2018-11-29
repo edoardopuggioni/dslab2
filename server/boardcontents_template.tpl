@@ -1,6 +1,7 @@
 <!-- this place will show the actual contents of the blackboard.
 It will be reloaded automatically from the server -->
 <div id="boardcontents_placeholder">
+	<div id="display_error"> Error ? {{error}} </div>
 	<!-- The title comes here -->
 	<div id="boardtitle_placeholder" class="boardtitle">{{board_title}}</div>
     <input type="text" name="id" value="ID" readonly>

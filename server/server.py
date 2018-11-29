@@ -184,19 +184,12 @@ try:
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
                         error = display_error)
 
-    @app.route('/error')
-    def indexof():
-        global board, node_id
-        return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
-                        board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
-                        error='The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.')
-
     @app.get('/board')
     def get_board():
         global board, node_id
         print board
         return template('server/boardcontents_template.tpl', board_title='Vessel {}'.format(node_id),
-                        board_dict=sorted(board.iteritems()))
+                        board_dict=sorted(board.iteritems()), error = display_error)
 
 
     # ------------------------------------------------------------------------------------------------------
