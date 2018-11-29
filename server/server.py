@@ -273,7 +273,7 @@ try:
         return False
 
 
-    @app.post('/board/<element_id:int>/')
+    @app.post('/board/<element_id:int>')
     def client_action_received(element_id):
 
         # Modify or delete an element in the board
@@ -321,7 +321,7 @@ try:
             # If we are not the leader, we send to the leader the modification we want to make
             else:
                 # The same path, with the id of the element we want to modify
-                path = "/board/" + str(element_id) + "/"
+                path = "/board/" + str(element_id)
 
                 # The ip of the leader
                 vessel_ip = vessel_list[str(leader_id)]
@@ -351,7 +351,7 @@ try:
             # If we are not the leader, we send to the leader the modification we want to make
             else:
                 # The same path, with the id of the element we want to delete
-                path = "/board/" + str(element_id) + "/"
+                path = "/board/" + str(element_id)
 
                 # The ip of the leader
                 vessel_ip = vessel_list[str(leader_id)]
