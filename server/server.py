@@ -41,6 +41,7 @@ try:
     leader_id = 0
 
     display_error = ""
+    board_title = ""
 
     # ------------------------------------------------------------------------------------------------------
     # BOARD FUNCTIONS
@@ -179,8 +180,9 @@ try:
 
     @app.route('/')
     def index():
-        global board, node_id, display_error
-        return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
+        global board, node_id, display_error, board_title
+        board_title = 'Vessel {}'.format(node_id)
+        return template('server/index.tpl', board_title=board_title,
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
                         error = display_error)
 
@@ -351,7 +353,7 @@ try:
     @app.post('/propagate/<action>/<element_id>/<potential_leader>')
     def propagation_received_potential_leader(action, element_id, potential_leader):
 
-        global election_number, node_id, leader_id, vessel_list, board, board_id, display_error
+        global election_number, node_id, leader_id, vessel_list, board, board_id, display_error, board_title
 
         if action == "findPotentialLeader":
             if str(element_id) == str(node_id):
@@ -394,6 +396,7 @@ try:
             print "****************************************\n"
 
             display_error = 'The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.'
+            board_title = 'WAIT A MINUTE'
 
             if str(element_id) != str(node_id) :
                 del vessel_list[str(potential_leader)]

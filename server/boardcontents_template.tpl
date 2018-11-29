@@ -1,9 +1,9 @@
 <!-- this place will show the actual contents of the blackboard.
 It will be reloaded automatically from the server -->
 <div id="boardcontents_placeholder">
-	<div id="display_error"> {{error}} </div>
 	<!-- The title comes here -->
 	<div id="boardtitle_placeholder" class="boardtitle">{{board_title}}</div>
+		<div id="display_error"> {{error}} </div>
     <input type="text" name="id" value="ID" readonly>
     <input type="text" name="entry" value="Entry" size="70%%" readonly>
     % for board_entry, board_element in board_dict:
