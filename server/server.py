@@ -163,8 +163,8 @@ try:
             neighbour_ip = vessel_list.values()[0]
 
         # Debug prints
-        print "Propagating to " + str(neighbour_ip) + " with path:"
-        print path
+        # print "Propagating to " + str(neighbour_ip) + " with path:"
+        # print path
 
         success = contact_vessel(str(neighbour_ip), path, payload, req)
         if not success:
@@ -185,7 +185,7 @@ try:
                         error = display_error)
 
     @app.route('/error')
-    def index():
+    def indexof():
         global board, node_id
         return template('server/index.tpl', board_title='Vessel {}'.format(node_id),
                         board_dict=sorted(board.iteritems()), members_name_string='Group Italia-French',
@@ -393,6 +393,8 @@ try:
             print "[DEBUG] The vessel crashed :" + potential_leader
             print "****************************************\n"
 
+            display_error = 'The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.'
+
             if str(element_id) != str(node_id) :
                 del vessel_list[str(potential_leader)]
 
@@ -407,7 +409,6 @@ try:
                 thread.deamon = True
                 thread.start()
 
-                display_error = 'The server leader is down... We are sorry but the message is lost. Wait a few seconds to find a new leader.'
 
         pass
 
