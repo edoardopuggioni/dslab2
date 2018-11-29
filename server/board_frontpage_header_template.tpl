@@ -104,6 +104,7 @@ footer {
     An error shown here means the server is not responding -->
     <div id="boardcontents_status_placeholder">0: success</div>
 
+    <div id="display_error"> Error ? {{error}} </div>
     <!-- This is a target for forms to prevent reloading the page on form submit. We handle the update in the script instead. USE style="display:none" to hide it -->
     <iframe id="test" name="noreload-form-target" width="90%" height="50" src="about:blank" frameborder="0" scrolling="yes" resizable seamless></iframe>
 
