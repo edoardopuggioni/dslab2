@@ -18,7 +18,7 @@ var page_reload_count = 0;
 function update_contents(){
     page_reload_count += 1;
     $('#display_error').load("/ #display_error", function (data, status) {
-        alert("Data: " + data + "\nStatus: " + status);
+      //  alert("Data: " + data + "\nStatus: " + status);
     });
     $("#boardcontents_placeholder").load("/board #boardcontents_placeholder", function (data, status) {
         //alert("Data: " + data + "\nStatus: " + status);
