@@ -28,6 +28,8 @@ import requests
 try:
     app = Bottle()
 
+    first = True
+
     # Dictionary to store all entries of the blackboard.
     board = {}
 
@@ -221,7 +223,14 @@ try:
         # Called directly when a vessel or a user sends a POST request to the leader. It is adding the data to the board, assign an
         # id and propagate it to every nodes.
 
-        global board, node_id, board_id, leader_id
+        global board, node_id, board_id, leader_id, first
+
+        if first:
+            filename = str(node_id) + "file.txt"
+            file = open(filename, "w")
+            file.write(str(time.time()) + "\n\n")
+            file.close()
+            first = False
 
         try:
 
@@ -380,6 +389,11 @@ try:
             # If we are the leader_id we retrieve the new entry from the body of the POST request.
             entry = request.body.read()
             add_new_element_to_store(element_id, entry)
+
+            filename = str(node_id) + "file.txt"
+            file = open(filename, "a")
+            file.write(str(time.time()) + "\n\n")
+            file.close()
 
         if action == "mod":
             # We retrieve the new entry from the body of the POST request.
@@ -553,7 +567,7 @@ try:
         vessel_list = dict()
 
         # We need to write the other vessels IP, based on the knowledge of their number
-        for i in range(1, args.nbv):
+        for i in range(1, args.nbv+1):
             vessel_list[str(i)] = '10.1.0.{}'.format(str(i))
             # vessel_list[str(i)] = '127.0.0.{}'.format(str(i))
 
